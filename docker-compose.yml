@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  mongodb:
+    container_name: wellfound-db
+    image: mongo:4.0.10
+    ports:
+      - 27017:27017
+    volumes:
+      - wellfound-db:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+
+  wellfound:
+    container_name: wellfound
+    build:
+      context: .
+      dockerfile: ./apps/wellfound/Dockerfile.development
+    ports:
+      - 3001:3001 # set according to your project setup
+    volumes:
+      - ./apps/wellfound:/usr/src/app/apps/wellfound
+      - ./libs:/usr/src/app/libs
+
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      DB_URL: mongodb://mongodb:27017/wellfound
+      NODE_ENV: dev
+    env_file: ./apps/wellfound/.env
+
+volumes:
+  wellfound-db:
+  redis-data:
