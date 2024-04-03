@@ -26,6 +26,7 @@ import { SearchableDto } from 'wellfound/building-block/RequestableDto/searchabl
 import { UserCreator } from 'wellfound/building-block/RequestableDto/User/UserCreator';
 import { UserUpdate } from 'wellfound/building-block/RequestableDto/User/UserUpdate';
 import { ServiceError } from 'wellfound/building-block/utils/apiError';
+import { IDataService } from 'wellfound/manager/data/data.service';
 import { UserModelDocument } from 'wellfound/manager/user/user.model';
 import { IUserService } from 'wellfound/manager/user/user.service';
 
@@ -36,7 +37,23 @@ export class UserController {
   constructor(
     private authService: AuthManagerService,
     private userService: IUserService,
+    private dataService: IDataService,
   ) {}
+
+  @Get('allData')
+  async find(
+    @Query('Category') Category?: string,
+    @Query('limit') limit?: number,
+  ) {
+    const resolvedLimit = limit !== undefined ? limit : 0; // If limit is undefined, use 0
+    return await this.dataService.getAll(Category, resolvedLimit);
+  }
+  catch(error: any) {
+    throw new HttpException(
+      error.message,
+      error.statusCode ?? HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
 
   @UseGuards(LocalAuthGuard)
   @IsPublic()

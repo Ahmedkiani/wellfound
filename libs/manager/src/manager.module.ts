@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BuildingBlockModule } from 'wellfound/building-block';
 
+import { IDataService } from './data/data.service';
+import { DataManagerService } from './data/data-manager.service';
 import { DatabaseModule } from './database.module';
 import { IUserService } from './user/user.service';
 import { UserManagerService } from './user/user-manager.service';
@@ -33,10 +35,17 @@ import { UserManagerService } from './user/user-manager.service';
   ],
   providers: [
     UserManagerService,
-
+    DataManagerService,
     { provide: IUserService, useClass: UserManagerService },
+    { provide: IDataService, useClass: DataManagerService },
   ],
 
-  exports: [DatabaseModule, UserManagerService, IUserService],
+  exports: [
+    DatabaseModule,
+    UserManagerService,
+    IUserService,
+    IDataService,
+    DataManagerService,
+  ],
 })
 export class ManagerModule {}
